@@ -7,3 +7,5 @@ Tous les utilisateurs générés par les fixtures, y compris l’administrateur,
 Le mot de passe défini pour l’ensemble des comptes est : passer123.  
 
 Cela permet de se connecter facilement à l’application et de tester les différentes fonctionnalités sans avoir à gérer plusieurs mots de passe différents.
+
+Il faut penser à paramétrer une bd dans le fichier .env
