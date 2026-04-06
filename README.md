@@ -1,10 +1,5 @@
 ﻿# librairie-symfony
 
-
-Voici un texte simple, clair et sans mise en forme spéciale, comme tu l’as demandé.
-
----
-
 Après avoir lancé les fixtures, un compte administrateur est automatiquement créé.  
 L’administrateur utilise l’adresse email suivante : admin@gmail.com.  
 
