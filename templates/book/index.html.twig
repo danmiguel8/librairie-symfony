@@ -1,0 +1,255 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Catalogue des livres{% endblock %}
+
+{% block body %}
+<div class="catalog-container">
+
+    {% if is_granted('ROLE_LIBRARIAN') %}
+        <div class="create-btn-wrapper">
+            <a href="{{ path('app_book_new') }}" class="btn-create">Ajouter un livre</a>
+        </div>
+    {% endif %}
+
+    <h1 class="catalog-title">Catalogue des livres</h1>
+
+    <div class="catalog-grid">
+        {% for book in books %}
+            <div class="book-card">
+
+                <div class="book-cover">
+                    {% if book.file %}
+                        <img src="{{ asset('uploads/files/' ~ book.file) }}" alt="{{ book.title }}">
+                    {% else %}
+                        <div class="no-cover">Aucune image</div>
+                    {% endif %}
+                </div>
+
+                <div class="book-info">
+                    <h3 class="book-title">{{ book.title }}</h3>
+
+                    {% if book.description %}
+                        <p class="book-desc">
+                            {{ book.description|slice(0, 80) ~ '...' }}
+                        </p>
+                    {% endif %}
+
+                    <p class="book-stock">
+                        Stock :
+                        {% if book.quantite > 10 %}
+                            <span class="stock-ok">{{ book.quantite }} disponibles</span>
+                        {% elseif book.quantite > 0 %}
+                            <span class="stock-low">{{ book.quantite }} restants</span>
+                        {% else %}
+                            <span class="stock-out">Rupture de stock</span>
+                        {% endif %}
+                    </p>
+
+                    <div class="book-actions">
+                        <a href="{{ path('app_book_show', {'id': book.id}) }}" class="btn-view">Voir</a>
+                        {% if is_granted('ROLE_LIBRARIAN') %}
+                            <a href="{{ path('app_book_edit', {'id': book.id}) }}" class="btn-edit">Modifier</a>
+                        {% endif %}
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('app_reservation_commentaire', {'id': book.id}) }}" class="btn btn-primary">
+                                <i class="bi bi-chat-dots"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        {% else %}
+            <p class="no-results">Aucun livre trouvé.</p>
+        {% endfor %}
+    </div>
+     {% if total > limit %}
+        <div class="pagination">
+            {% set pages = (total / limit)|round(0, 'ceil') %}
+
+            {% if page > 1 %}
+                <a href="?page={{ page - 1 }}" class="page-btn">← Précédent</a>
+            {% endif %}
+
+            {% for p in 1..pages %}
+                <a href="?page={{ p }}"
+                   class="page-number {{ p == page ? 'active' : '' }}">
+                    {{ p }}
+                </a>
+            {% endfor %}
+
+            {% if page < pages %}
+                <a href="?page={{ page + 1 }}" class="page-btn">Suivant →</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .catalog-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .pagination {
+        margin-top: 30px;
+        text-align: center;
+    }
+
+    .page-number, .page-btn {
+        display: inline-block;
+        padding: 8px 14px;
+        margin: 0 4px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        text-decoration: none;
+        color: #333;
+    }
+
+    .page-number.active {
+        background: #2c3e50;
+        color: white;
+        border-color: #2c3e50;
+    }
+
+    .catalog-title {
+        text-align: center;
+        font-size: 36px;
+        margin-bottom: 30px;
+        font-weight: 700;
+    }
+
+    .catalog-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 25px;
+    }
+
+    .book-card {
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #ddd;
+        display: flex;
+        flex-direction: column;
+        transition: 0.2s ease;
+    }
+
+    .book-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    }
+
+    .book-cover img {
+        width: 100%;
+        height: 260px;
+        object-fit: cover;
+    }
+
+    .no-cover {
+        width: 100%;
+        height: 260px;
+        background: #eee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #777;
+        font-size: 14px;
+    }
+
+    .book-info {
+        padding: 15px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .book-title {
+        font-size: 20px;
+        margin-bottom: 5px;
+    }
+
+    .book-desc {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .book-stock {
+        font-size: 15px;
+        margin-bottom: 15px;
+    }
+
+    .stock-ok {
+        color: #27ae60;
+        font-weight: bold;
+    }
+
+    .stock-low {
+        color: #e67e22;
+        font-weight: bold;
+    }
+
+    .stock-out {
+        color: #c0392b;
+        font-weight: bold;
+    }
+
+    .book-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: auto;
+    }
+
+    .btn-view, .btn-edit {
+        padding: 8px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 14px;
+        color: white;
+    }
+
+    .btn-view {
+        background: #2c3e50;
+    }
+
+    .btn-edit {
+        background: #27ae60;
+    }
+
+    .btn-view:hover {
+        background: #1a242f;
+    }
+
+    .btn-edit:hover {
+        background: #1e8449;
+    }
+
+    .create-btn-wrapper {
+        text-align: right;
+        margin-top: 30px;
+    }
+
+    .btn-create {
+        padding: 12px 20px;
+        background: #2980b9;
+        color: white;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 16px;
+    }
+
+    .btn-create:hover {
+        background: #1f6391;
+    }
+
+    .no-results {
+        text-align: center;
+        font-size: 18px;
+        color: #777;
+        grid-column: 1 / -1;
+    }
+</style>
+
+{% endblock %}

@@ -1,0 +1,249 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}favoris{% endblock %}
+
+{% block body %}
+<div class="catalog-container">
+
+    <h1 class="catalog-title">Mes favoris</h1>
+
+    <div class="catalog-grid">
+        {% for book in books %}
+            <div class="book-card">
+
+                <div class="book-cover">
+                    {% if book.file %}
+                        <img src="{{ asset('uploads/files/' ~ book.file) }}" alt="{{ book.title }}">
+                    {% else %}
+                        <div class="no-cover">Aucune image</div>
+                    {% endif %}
+                </div>
+
+                <div class="book-info">
+                    <h3 class="book-title">{{ book.title }}</h3>
+
+                    {% if book.description %}
+                        <p class="book-desc">
+                            {{ book.description|slice(0, 80) ~ '...' }}
+                        </p>
+                    {% endif %}
+
+                    <p class="book-stock">
+                        Stock :
+                        {% if book.quantite > 10 %}
+                            <span class="stock-ok">{{ book.quantite }} disponibles</span>
+                        {% elseif book.quantite > 0 %}
+                            <span class="stock-low">{{ book.quantite }} restants</span>
+                        {% else %}
+                            <span class="stock-out">Rupture de stock</span>
+                        {% endif %}
+                    </p>
+
+                    <div class="book-actions d-flex gap-2">
+                        {% if book.quantite > 0 %}
+                            <a href="{{ path('app_reservation_reserver', {'id': book.id}) }}"  class="btn btn-success">
+                                Réserver <i class="bi bi-calendar-plus"></i>
+                            </a>
+                        {% else %}
+                            <a href="#"  class="btn btn-danger" style="cursor: not-allowed;">
+                                Indisponible <i class="bi bi-x-circle"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    {% if app.user %}
+                        {% set isFavoris = false %}
+                        {% set id = null %}
+                        {% set break = false %}
+                        {% for fav in app.user.favoris %}
+                            {% if fav.book.id == book.id %}
+                                {% set isFavoris = true %}
+                                {% set id = fav.id %}
+                                {% set break = true %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if isFavoris %}
+                            <div class="book-actions mt-2"> 
+                                <a href="{{ path('app_favoris_remove', {'id': id}) }}" class="btn btn-danger">
+                                    <i class="bi bi-heart-fill"></i>
+                                </a>
+                            </div>
+                        {% else %}
+                            <div class="book-actions mt-2"> 
+                                <a href="{{ path('app_favoris', {'id': book.id}) }}" class="btn btn-outline-danger">
+                                    <i class="bi bi-heart"></i>
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="book-actions mt-2"> 
+                            <a href="{{ path('app_favoris', {'id': book.id}) }}" class="btn btn-outline-danger">
+                                <i class="bi bi-heart"></i>
+                            </a>
+                        </div>
+                    {% endif %}  
+                </div>
+
+            </div>
+        {% else %}
+            <p class="no-results">Aucun livre trouvé.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .catalog-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .catalog-title {
+        text-align: center;
+        font-size: 36px;
+        margin-bottom: 30px;
+        font-weight: 700;
+    }
+
+    .catalog-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 25px;
+    }
+
+    .book-card {
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #ddd;
+        display: flex;
+        flex-direction: column;
+        transition: 0.2s ease;
+    }
+
+    .book-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    }
+
+    .book-cover img {
+        width: 100%;
+        height: 260px;
+        object-fit: cover;
+    }
+
+    .no-cover {
+        width: 100%;
+        height: 260px;
+        background: #eee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #777;
+        font-size: 14px;
+    }
+
+    .book-info {
+        padding: 15px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .book-title {
+        font-size: 20px;
+        margin-bottom: 5px;
+    }
+
+    .book-desc {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .book-stock {
+        font-size: 15px;
+        margin-bottom: 15px;
+    }
+
+    .stock-ok {
+        color: #27ae60;
+        font-weight: bold;
+    }
+
+    .stock-low {
+        color: #e67e22;
+        font-weight: bold;
+    }
+
+    .stock-out {
+        color: #c0392b;
+        font-weight: bold;
+    }
+
+    .book-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: auto;
+    }
+
+    .btn-view, .btn-edit, .btn-favoris {
+        padding: 8px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 14px;
+        color: white;
+    }
+
+    .btn-view {
+        background: #2c3e50;
+    }
+
+    .btn-edit {
+        background: #27ae60;
+    }
+
+    .btn-favoris {
+        background: #e67e22;
+    }
+
+    .btn-favoris:hover {
+        background: #cf7119;
+    }
+
+    .btn-view:hover {
+        background: #1a242f;
+    }
+
+    .btn-edit:hover {
+        background: #1e8449;
+    }
+
+    .create-btn-wrapper {
+        text-align: right;
+        margin-top: 30px;
+    }
+
+    .btn-create {
+        padding: 12px 20px;
+        background: #2980b9;
+        color: white;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 16px;
+    }
+
+    .btn-create:hover {
+        background: #1f6391;
+    }
+
+    .no-results {
+        text-align: center;
+        font-size: 18px;
+        color: #777;
+        grid-column: 1 / -1;
+    }
+</style>
+
+{% endblock %}

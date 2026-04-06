@@ -1,39 +1,39 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Inscription{% endblock %}
+{% block title %}Modifier l’utilisateur{% endblock %}
 
 {% block body %}
 
 <div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
     <div class="card shadow-lg p-4" style="max-width: 480px; width: 100%;">
 
-        <h3 class="text-center mb-4">Créer un compte</h3>
+        <h3 class="text-center mb-4">Modifier l’utilisateur</h3>
 
         {{ form_start(form) }}
 
             <div class="mb-3">
                 {{ form_label(form.firstName) }}
                 {{ form_widget(form.firstName, {'attr': {'class': 'form-control'}}) }}
-                <span class="text-danger list-unstyled">{{ form_errors(form.firstName) }}</span>
-                
-            </div>
-
-            <div class="mb-3 d-none">
-                {{ form_label(form.roles) }}
-                {{ form_widget(form.roles, {'attr': {'class': 'form-control'}}) }}
-                <span class="text-danger list-unstyled">{{ form_errors(form.roles) }}</span>
+                <span class="text-danger">{{ form_errors(form.firstName) }}</span>
             </div>
 
             <div class="mb-3">
                 {{ form_label(form.lastName) }}
                 {{ form_widget(form.lastName, {'attr': {'class': 'form-control'}}) }}
-                <span class="text-danger list-unstyled">{{ form_errors(form.lastName) }}</span>
+                <span class="text-danger">{{ form_errors(form.lastName) }}</span>
             </div>
 
             <div class="mb-3">
                 {{ form_label(form.email) }}
                 {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
-                <span class="text-danger list-unstyled">{{ form_errors(form.email) }}</span>
+                <span class="text-danger">{{ form_errors(form.email) }}</span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Rôles</label>
+                <div class="border rounded p-3">
+                    {{ form_widget(form.roles) }}
+                </div>
             </div>
 
             <!-- Mot de passe -->
@@ -43,7 +43,6 @@
                     {{ form_widget(form.password, {
                         'attr': {
                             'class': 'form-control',
-                            'id': 'password-field'
                         }
                     }) }}
                     <button type="button" class="btn btn-outline-secondary" id="togglePassword">
@@ -60,7 +59,6 @@
                     {{ form_widget(form.confirmPassword, {
                         'attr': {
                             'class': 'form-control',
-                            'id': 'confirm-password-field'
                         }
                     }) }}
                     <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword">
@@ -69,22 +67,23 @@
                 </div>
                 <span class="text-danger">{{ form_errors(form.confirmPassword) }}</span>
             </div>
-            <button type="submit" class="btn btn-success w-100 py-2">
-                Créer mon compte
+
+            <button type="submit" class="btn btn-primary w-100 py-2">
+                Mettre à jour
             </button>
 
         {{ form_end(form) }}
 
         <div class="text-center mt-3">
-            <small>
-                Déjà inscrit ?
-                <a href="{{ path('app_login') }}">Se connecter</a>
-            </small>
+            <a href="{{ path('admin_user_index') }}" class="text-decoration-none">
+                ← Retour à la liste
+            </a>
         </div>
 
     </div>
 </div>
 
+<!-- Script toggle mot de passe -->
 <script>
     function togglePasswordVisibility(buttonId, fieldId) {
         const button = document.getElementById(buttonId);

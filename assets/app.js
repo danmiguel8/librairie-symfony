@@ -1,4 +1,8 @@
 import './stimulus_bootstrap.js';
+import { Calendar } from '@fullcalendar/core';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import '@fullcalendar/daygrid/main.css';
+
 /*
  * Welcome to your app's main JavaScript file!
  *

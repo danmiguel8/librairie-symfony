@@ -1,0 +1,184 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Commentaires sur {{ book.title }}{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+
+        <a href="{{ path('app_book_index') }}" style="text-align: right;" class="btn btn-secondary mt-4 mb-4">
+            ← Aller vers le catalogue
+        </a>
+    <!-- Informations du livre -->
+    <div class="card shadow-sm mb-4 p-4">
+
+        <div class="row g-4">
+            <!-- Image -->
+            <div class="col-md-4">
+                {% if book.file %}
+                    <img src="{{ asset('uploads/files/' ~ book.file) }}" class="img-fluid rounded" alt="{{ book.title }}">
+                {% else %}
+                    <div class="d-flex align-items-center justify-content-center bg-light rounded" style="height: 250px;">
+                        <span class="text-muted">Aucune image</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Infos -->
+            <div class="col-md-8">
+                <h1 class="mb-3">{{ book.title }}</h1>
+
+                {% if book.author %}
+                    <p><strong>Auteur :</strong> {{ book.author.firstName }} {{ book.author.lastName }}</p>
+                {% endif %}
+
+                {% if book.category|length > 0 %}
+                    <p>
+                        <strong>Catégories :</strong>
+                        {% for cat in book.category %}
+                            <span class="badge bg-primary me-1">{{ cat.title }}</span>
+                        {% endfor %}
+                    </p>
+                {% endif %}
+
+                {% if book.description %}
+                    <p class="text-muted">{{ book.description }}</p>
+                {% endif %}
+
+
+                {% if is_granted('ROLE_USER') and app.user.roles[0] == "ROLE_USER" %}
+                    <div class="book-actions"> 
+                        {% if book.quantite > 0 %}
+                            <a href="{{ path('app_reservation_reserver', {'id': book.id}) }}" class="btn-edit">Réserver</a>
+                        {% else %}
+                            <a href="#" class="btn-edit" style="background: #c0392b; cursor: not-allowed;">Indisponible</a>
+                        {% endif %}
+
+                        {% if app.user %}
+                            {% for reservation in app.user.reservations %}
+                                {% if reservation.status == 'Terminé' and reservation.books.contains(book) %}
+                                    <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#commentModal">
+                                        <i class="bi bi-chat-dots"></i> Commenter
+                                    </a>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Commentaires -->
+    <div class="card shadow-sm p-4">
+        <h2 class="mb-4">Commentaires</h2>
+
+        {% if comments is empty %}
+            <p class="text-muted">Aucun commentaire pour ce livre.</p>
+        {% else %}
+            {% for comment in comments %}
+                <div class="border-bottom pb-3 mb-3">
+                    <div class="mb-1 d-flex align-items-center">
+                        {% for i in 1..5 %}
+                            {% if i <= comment.raiting %}
+                                <i class="bi bi-star-fill text-warning"></i>
+                            {% else %}
+                                <i class="bi bi-star text-secondary"></i>
+                            {% endif %}
+                        {% endfor %}
+                        <span class="badge bg-primary ms-2">{{ comment.raiting }}/5</span>
+                    </div>
+
+                    <!-- Auteur + date -->
+                    <p class="mb-1">
+                        <strong>{{ comment.reservation.client.firstName }} {{ comment.reservation.client.lastName }}</strong>
+                        <span class="text-muted">- {{ comment.created|date('d/m/Y') }}</span>
+                    </p>
+
+                    <!-- Message -->
+                    <p>{{ comment.message }}</p>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <div class="book-actions"> 
+                                <form method="post" class="d-inline" action="{{ path('app_reservation_commentaire_remove', {'id': comment.id}) }}" onsubmit="return confirm('Voulez vous vraiment supprimer ce commentaire?');">
+
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ comment.id) }}">
+
+                                <button class="btn btn-danger">
+                                    Supprimer le commentaire
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Modal Commentaire -->
+    <div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="commentModalLabel">Ajouter un commentaire</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form action="{{ path('app_reservation_commentaire_add', {'id': book.id}) }}" method="post">
+
+                        <!-- Note -->
+                        <div class="mb-3">
+                            <label class="form-label">Note</label>
+                            <select name="raiting" class="form-select">
+                                <option value="5">5 ⭐⭐⭐⭐⭐</option>
+                                <option value="4">4 ⭐⭐⭐⭐</option>
+                                <option value="3">3 ⭐⭐⭐</option>
+                                <option value="2">2 ⭐⭐</option>
+                                <option value="1">1 ⭐</option>
+                            </select>
+                        </div>
+
+                        <!-- Message -->
+                        <div class="mb-3">
+                            <label class="form-label">Commentaire</label>
+                            <textarea name="message" class="form-control" rows="4" required></textarea>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-primary">Envoyer</button>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .book-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: auto;
+    }
+
+    .btn-view, .btn-edit, .btn-favoris {
+        padding: 8px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 14px;
+        color: white;
+    }
+
+    .btn-edit {
+        background: #27ae60;
+    }
+    .btn-edit:hover {
+        background: #1e8449;
+    }
+</style>
+
+{% endblock %}

@@ -1,0 +1,168 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recherche de livres{% endblock %}
+
+{% block body %}
+<div class="search-container">
+
+    <h1 class="search-title">Recherche de livres</h1>
+
+    <form method="get" action="{{ path('app_search') }}" class="search-form">
+        <input 
+            type="text" 
+            name="q" 
+            value="{{ query }}" 
+            placeholder="Rechercher un titre, un auteur, une catégorie..."
+            class="search-input"
+        >
+        <button type="submit" class="search-btn">Rechercher</button>
+    </form>
+
+    <div class="results-info">
+        {% if total > 0 %}
+            <p>{{ total }} résultat{{ total > 1 ? 's' : '' }} trouvé{{ total > 1 ? 's' : '' }}</p>
+        {% else %}
+            <p>Aucun résultat trouvé pour « {{ query }} »</p>
+        {% endif %}
+    </div>
+
+    <div class="results-list">
+        {% for book in books %}
+            <div class="result-card">
+                <h3>{{ book.title }}</h3>
+                <p class="author">
+                    {{ book.author.firstName }} {{ book.author.lastName }}
+                </p>
+
+                {% if book.category|length > 0 %}
+                    <p class="categories">
+                        {% for cat in book.category %}
+                            <span class="cat">{{ cat.title }}</span>
+                        {% endfor %}
+                    </p>
+                    <a href="{{ path('app_book_show', {'id': book.id}) }}" class="btn-view">Détails</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if total > limit %}
+        <div class="pagination">
+            {% set pages = (total / limit)|round(0, 'ceil') %}
+
+            {% if page > 1 %}
+                <a href="?q={{ query }}&page={{ page - 1 }}" class="page-btn">← Précédent</a>
+            {% endif %}
+
+            {% for p in 1..pages %}
+                <a href="?q={{ query }}&page={{ p }}"
+                   class="page-number {{ p == page ? 'active' : '' }}">
+                    {{ p }}
+                </a>
+            {% endfor %}
+
+            {% if page < pages %}
+                <a href="?q={{ query }}&page={{ page + 1 }}" class="page-btn">Suivant →</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .search-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .search-title {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 32px;
+        font-weight: 700;
+    }
+
+    .search-form {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 25px;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+    }
+
+    .search-btn {
+        padding: 12px 20px;
+        background: #2c3e50;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .results-info {
+        margin-bottom: 20px;
+        font-size: 18px;
+        color: #555;
+    }
+
+    .results-list {
+        display: grid;
+        gap: 20px;
+    }
+
+    .result-card {
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        background: #fafafa;
+    }
+
+    .result-card h3 {
+        margin: 0 0 5px 0;
+    }
+
+    .author {
+        color: #444;
+        font-size: 15px;
+    }
+
+    .categories .cat {
+        display: inline-block;
+        background: #e1ecf4;
+        color: #0366d6;
+        padding: 3px 8px;
+        border-radius: 4px;
+        margin-right: 5px;
+        font-size: 13px;
+    }
+
+    .pagination {
+        margin-top: 30px;
+        text-align: center;
+    }
+
+    .page-number, .page-btn {
+        display: inline-block;
+        padding: 8px 14px;
+        margin: 0 4px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        text-decoration: none;
+        color: #333;
+    }
+
+    .page-number.active {
+        background: #2c3e50;
+        color: white;
+        border-color: #2c3e50;
+    }
+</style>
+
+{% endblock %}

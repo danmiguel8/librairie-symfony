@@ -40,9 +40,13 @@ final class RegisterController extends AbstractController
             $em->persist($user);
             $em->flush();
 
+            if ($this->isGranted('ROLE_ADMIN')) {
+                $this->addFlash('success', 'Utilisateur créé avec succès.');
+                return $this->redirectToRoute('admin_user_index');
+            }
+
             return $this->redirectToRoute('app_login');
         }
-
 
         return $this->render('register/index.html.twig', [
             'form' => $form->createView()

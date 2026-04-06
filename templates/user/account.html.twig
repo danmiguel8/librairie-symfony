@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon compte{% endblock %}
+
+{% block body %}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-lg p-4" style="max-width: 600px; width: 100%;">
+
+        <h3 class="text-center mb-4">Mon compte</h3>
+
+        <div class="mb-4">
+            <h5 class="mb-3">Informations personnelles</h5>
+
+            <p><strong>Prénom :</strong> {{ app.user.firstName }}</p>
+            <p><strong>Nom :</strong> {{ app.user.lastName }}</p>
+            <p><strong>Email :</strong> {{ app.user.email }}</p>
+
+            <p>
+                <strong>Rôle(s) :</strong><br>
+                {% for role in app.user.roles %}
+                    {% if role == 'ROLE_ADMIN' %}
+                        <span class="badge bg-danger">Administrateur</span>
+                    {% elseif role == 'ROLE_LIBRARIAN' %}
+                        <span class="badge bg-warning text-dark">Bibliothécaire</span>
+                    {% elseif role == 'ROLE_USER' %}
+                        <span class="badge bg-primary">Utilisateur</span>
+                    {% endif %}
+                {% endfor %}
+            </p>
+        </div>
+
+        <hr>
+
+        {% if is_granted('ROLE_USER') %}
+            <div class="mb-4">
+                <h5 class="mb-3">Mes réservations</h5>
+                <a href="{{ path('app_profile') }}" class="btn btn-outline-success w-100">
+                    Voir mes réservations
+                </a>
+            </div>
+        {% endif %}
+
+        {% if is_granted('ROLE_LIBRARIAN') or is_granted('ROLE_ADMIN') %}
+            <div class="mb-4">
+                <h5 class="mb-3">Gestion</h5>
+
+                {% if is_granted('ROLE_LIBRARIAN') %}
+                    <a href="{{ path('app_reservation_history') }}" class="btn btn-outline-warning w-100 mb-2">
+                        Historique des réservations
+                    </a>
+                {% endif %}
+
+                {% if is_granted('ROLE_ADMIN') %}
+                    <a href="{{ path('admin_user_index') }}" class="btn btn-outline-danger w-100">
+                        Gestion des utilisateurs
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

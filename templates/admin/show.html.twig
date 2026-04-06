@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Utilisateur : {{ user.email }}{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+
+    <h1 class="mb-4 text-center">Détails de l’utilisateur</h1>
+
+    <div class="card shadow-sm p-4 mx-auto" style="max-width: 700px;">
+
+        <h4 class="mb-3">{{ user.firstname }} {{ user.lastname }}</h4>
+
+        <ul class="list-group mb-4">
+            <li class="list-group-item">
+                <strong>ID :</strong> {{ user.id }}
+            </li>
+            <li class="list-group-item">
+                <strong>Email :</strong> {{ user.email }}
+            </li>
+            <li class="list-group-item">
+                <strong>Rôles :</strong>
+                {% for role in user.roles %}
+                    <span class="badge bg-primary">{{ role }}</span>
+                {% endfor %}
+            </li>
+        </ul>
+
+        <div class="d-flex justify-content-between">
+            <a href="{{ path('admin_user_index') }}" class="btn btn-secondary">
+                ← Retour à la liste
+            </a>
+
+            <a href="{{ path('admin_user_edit', {id: user.id}) }}" class="btn btn-warning">
+                Modifier
+            </a>
+
+            <form method="post"
+                  action="{{ path('admin_user_delete', {id: user.id}) }}"
+                  onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                <button class="btn btn-danger">Supprimer</button>
+            </form>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

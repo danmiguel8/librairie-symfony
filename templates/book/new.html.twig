@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter un livre{% endblock %}
+
+{% block body %}
+<div class="form-container">
+
+    <h1 class="page-title">Ajouter un nouveau livre</h1>
+
+    <div class="form-card">
+        {{ form_start(form) }}
+
+            <div class="form-fields">
+                {{ form_widget(form) }}
+            </div>
+
+            <button class="btn-submit">
+                {{ button_label|default('Enregistrer le livre') }}
+            </button>
+
+        {{ form_end(form) }}
+    </div>
+
+    <div class="back-wrapper">
+        <a href="{{ path('app_book_index') }}" class="btn-back">← Retour au catalogue</a>
+    </div>
+
+</div>
+
+<style>
+    .form-container {
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .page-title {
+        text-align: center;
+        font-size: 32px;
+        margin-bottom: 25px;
+        font-weight: 700;
+    }
+
+    .form-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 25px;
+        border: 1px solid #ddd;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .form-fields {
+        margin-bottom: 20px;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 12px;
+        background: #2c3e50;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .btn-submit:hover {
+        background: #1a242f;
+    }
+
+    .back-wrapper {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .btn-back {
+        text-decoration: none;
+        color: #2c3e50;
+        font-size: 15px;
+        transition: 0.2s ease;
+    }
+
+    .btn-back:hover {
+        color: #000;
+        text-decoration: underline;
+    }
+</style>
+
+{% endblock %}

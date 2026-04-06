@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de la réservation{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold">Détails de la réservation #{{ reservation.id }}</h1>
+
+        <a href="{{ path('app_reservation_history') }}" class="btn btn-secondary">
+            ← Retour à la liste
+        </a>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+
+            <h4 class="mb-3">Informations générales</h4>
+
+            <p>
+                <strong>Client :</strong><br>
+                <span class="badge bg-primary fs-6">
+                    {{ reservation.client.firstName }} {{ reservation.client.lastName }}
+                </span>
+            </p>
+
+            <p>
+                <strong>Date de début :</strong><br>
+                <span class="badge bg-success">
+                    {{ reservation.dateDebut|date('d/m/Y') }}
+                </span>
+            </p>
+
+            <p>
+                <strong>Date de fin :</strong><br>
+                <span class="badge bg-danger">
+                    {{ reservation.dateFin|date('d/m/Y') }}
+                </span>
+            </p>
+
+            <p>
+                <strong>Statut :</strong><br>
+                {% if reservation.status == 'en cours' %}
+                    <span class="badge bg-warning text-dark">En cours</span>
+                {% elseif reservation.status == 'terminée' %}
+                    <span class="badge bg-success">Terminée</span>
+                {% else %}
+                    <span class="badge bg-secondary">{{ reservation.status }}</span>
+                {% endif %}
+            </p>
+
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h4 class="mb-3">Livres réservés</h4>
+
+            {% if reservation.books is empty %}
+                <p class="text-muted">Aucun livre associé à cette réservation.</p>
+            {% else %}
+                <ul class="list-group">
+                    {% for book in reservation.books %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>
+                                <strong>{{ book.title }}</strong><br>
+                                <small class="text-muted">{{ book.author.firstName }} {{ book.author.lastName }}</small>
+                            </span>
+                            <span class="badge bg-primary rounded-pill">ID {{ book.id }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="d-flex gap-3">
+        <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="btn btn-warning">
+            ✏️ Modifier
+        </a>
+
+        {{ include('reservation/_delete_form.html.twig') }}
+    </div>
+
+</div>
+{% endblock %}

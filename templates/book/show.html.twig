@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+
+    <div class="row g-4">
+
+        <!-- Image du livre -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                {% if book.file %}
+                    <img src="{{ asset('uploads/files/' ~ book.file) }}" 
+                         class="card-img-top" 
+                         alt="{{ book.title }}">
+                {% else %}
+                    <div class="d-flex align-items-center justify-content-center bg-light" 
+                         style="height: 350px;">
+                        <span class="text-muted">Aucune image</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Informations du livre -->
+        <div class="col-md-8">
+            <div class="card shadow-sm p-4">
+
+                <h1 class="mb-3">{{ book.title }}</h1>
+
+                {% if book.author %}
+                    <p class="mb-2">
+                        <strong>Auteur :</strong>
+                        {{ book.author.firstName }} {{ book.author.lastName }}
+                    </p>
+                {% endif %}
+
+                {% if book.category|length > 0 %}
+                    <p class="mb-2">
+                        <strong>Catégories :</strong>
+                        {% for cat in book.category %}
+                            <span class="badge bg-primary me-1">{{ cat.title }}</span>
+                        {% endfor %}
+                    </p>
+                {% endif %}
+
+                {% if book.quantite is defined %}
+                    <p class="mb-3">
+                        <strong>Stock :</strong>
+                        {% if book.quantite > 10 %}
+                            <span class="badge bg-success">{{ book.quantite }} disponibles</span>
+                        {% elseif book.quantite > 0 %}
+                            <span class="badge bg-warning text-dark">{{ book.quantite }} restants</span>
+                        {% else %}
+                            <span class="badge bg-danger">Rupture de stock</span>
+                        {% endif %}
+                    </p>
+                {% endif %}
+
+                {% if book.description %}
+                    <p class="text-muted">{{ book.description }}</p>
+                {% endif %}
+
+                <div class="mt-4 d-flex gap-2">
+                    <a href="{{ path('app_book_index') }}" class="btn btn-secondary">
+                        ← Retour au catalogue
+                    </a>
+
+                    {% if is_granted('ROLE_LIBRARIAN') %}
+                        <a href="{{ path('app_book_edit', {'id': book.id}) }}" class="btn btn-success">
+                            Modifier
+                        </a>
+
+                        {{ include('book/_delete_form.html.twig') }}
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
